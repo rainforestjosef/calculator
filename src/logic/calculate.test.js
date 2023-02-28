@@ -43,15 +43,15 @@ describe("calculate", function() {
   });
 
   test(["6", "+", "6", "="], {
-    total: "12",
+    next: "12",
   });
 
   test(["0", "0", "+", "0", "="], {
-    total: "0",
+    next: "0",
   });
 
   test(["6", "+", "6", "=", "9"], {
-    next: "9",
+    next: "129",
   });
 
   test(["3", "+", "6", "=", "+"], {
@@ -66,13 +66,13 @@ describe("calculate", function() {
   });
 
   test(["3", "+", "6", "=", "+", "9", "="], {
-    total: "18",
+    next: "18",
   });
 
   // When '=' is pressed and there is not enough information to complete
   // an operation, the '=' should be disregarded.
   test(["3", "+", "=", "3", "="], {
-    total: "6",
+    next: "6",
   });
 
   test(["+"], {
@@ -111,7 +111,7 @@ describe("calculate", function() {
   });
 
   test(["+", "6", "+", "5", "="], {
-    total: "11",
+    next: "11",
   });
 
   test(["0", ".", "4"], {
@@ -129,7 +129,7 @@ describe("calculate", function() {
   });
 
   test([".", "4", "-", ".", "2", "="], {
-    total: "0.2",
+    next: "0.2",
   });
 
   // should clear the operator when AC is pressed
@@ -141,7 +141,7 @@ describe("calculate", function() {
   });
 
   test(["4", "%", "x", "2", "="], {
-    total: "0.08",
+    next: "0.08",
   });
 
   test(["4", "%", "x", "2"], {

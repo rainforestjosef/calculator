@@ -5,13 +5,17 @@ import "./Display.css";
 
 export default class Display extends React.Component {
   static propTypes = {
-    value: PropTypes.string,
+    total: PropTypes.string,
+    operation: PropTypes.string,
+    next: PropTypes.string
   };
 
   render() {
     return (
       <div className="component-display">
-        <div>{this.props.value}</div>
+        <span>{this.props.total}</span>
+        <span>{this.props.operation}</span>
+        <span>{this.props.next}</span>
       </div>
     );
   }
