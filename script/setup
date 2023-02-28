@@ -1,0 +1,7 @@
+#!/bin/sh
+
+yarn install
+
+npm install -g netlify-cli
+
+git remote add upstream -f https://github.com/magni-/calculator.git
