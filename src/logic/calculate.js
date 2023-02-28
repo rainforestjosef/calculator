@@ -111,7 +111,7 @@ export default function calculate(obj, buttonName) {
 
   // User pressed an operation button and there is an existing operation
   if (obj.operation) {
-    if (buttonName === "x") {
+    if (obj.operation === buttonName && buttonName === "x") {
       return {
         next: obj.next,
         operation: "^"
