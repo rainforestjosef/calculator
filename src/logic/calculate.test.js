@@ -155,12 +155,13 @@ describe("calculate", function() {
     total: "0.04",
   });
 
-  //Test that pressing the multiplication or division sign multiple times should not affect the current computation
+  // Test that pressing multiplication twice should switch to power operation
   test(["2", "x", "x"], {
     total: "2",
-    operation: "x"
+    operation: "^"
   });
 
+  // Test that pressing the multiplication or division sign multiple times should not affect the current computation
   test(["2", "÷", "÷"], {
     total: "2",
     operation: "÷"

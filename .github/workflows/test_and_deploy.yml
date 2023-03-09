@@ -1,0 +1,88 @@
+name: Test and Deploy
+
+on: [push]
+
+jobs:
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup dependencies
+        uses: actions/setup-node@v3
+        with:
+          cache: yarn
+          node-version-file: .nvmrc
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Run unit tests
+        run: yarn test
+
+  deploy_qa:
+    name: Deploy to QA
+    needs: test
+    if: github.ref_name != 'master'
+    outputs:
+      qa_url: ${{ steps.deploy.outputs.deploy_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup dependencies
+        uses: actions/setup-node@v3
+        with:
+          cache: yarn
+          node-version-file: .nvmrc
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Build
+        run: yarn build
+      - name: Install Netlify
+        run: npm install netlify-cli --save-dev
+      - name: Deploy
+        id: deploy
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_API_KEY }}
+          NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
+        run: |
+          netlify deploy --json | tee deploy.json
+          DEPLOY_URL=$(cat deploy.json | jq -r .deploy_url)
+          echo "deploy_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
+
+  rainforest:
+    name: Rainforest Tests
+    needs: deploy_qa
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Rainforest tests
+        uses: rainforestapp/github-action@v3
+        with:
+          token: ${{ secrets.RAINFOREST_API_KEY }}
+          run_group_id: ${{ vars.RAINFOREST_RUN_GROUP_ID }}
+          custom_url: ${{ needs.deploy_qa.outputs.qa_url }}
+
+  deploy_prod:
+    name: Deploy to Production
+    needs: test
+    if: github.ref_name == 'master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup dependencies
+        uses: actions/setup-node@v3
+        with:
+          cache: yarn
+          node-version-file: .nvmrc
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Build
+        run: yarn build
+      - name: Install Netlify
+        run: npm install netlify-cli --save-dev
+      - name: Deploy
+        env:
+          NETLIFY_AUTH_KEY: ${{ secrets.NETLIFY_API_KEY }}
+          NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
+        run: netlify deploy --prod
